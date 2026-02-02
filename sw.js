@@ -1,45 +1,67 @@
-var CACHE_NAME = 'ciclo-v2';
-var urlsToCache = [
+// Service Worker for Ciclo
+const CACHE_NAME = 'ciclo-v1';
+const ASSETS = [
     './',
     './index.html',
-    './main.js',
     './style.css',
+    './main.js',
+    './manifest.json',
     './icon.svg',
     './icon-192.png',
     './icon-512.png'
 ];
 
-self.addEventListener('install', function (event) {
+// Install event
+self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then(function (cache) {
-                return cache.addAll(urlsToCache);
+            .then((cache) => {
+                console.log('Caching app assets');
+                return cache.addAll(ASSETS);
             })
+            .then(() => self.skipWaiting())
     );
 });
 
-self.addEventListener('fetch', function (event) {
+// Activate event
+self.addEventListener('activate', (event) => {
+    event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames
+                    .filter((name) => name !== CACHE_NAME)
+                    .map((name) => caches.delete(name))
+            );
+        }).then(() => self.clients.claim())
+    );
+});
+
+// Fetch event - Cache first, then network
+self.addEventListener('fetch', (event) => {
     event.respondWith(
         caches.match(event.request)
-            .then(function (response) {
+            .then((response) => {
                 if (response) {
                     return response;
                 }
-                return fetch(event.request);
+                return fetch(event.request)
+                    .then((response) => {
+                        // Don't cache non-successful responses
+                        if (!response || response.status !== 200 || response.type !== 'basic') {
+                            return response;
+                        }
+                        // Clone the response
+                        const responseToCache = response.clone();
+                        caches.open(CACHE_NAME)
+                            .then((cache) => {
+                                cache.put(event.request, responseToCache);
+                            });
+                        return response;
+                    })
+                    .catch(() => {
+                        // Return offline page if available
+                        return caches.match('./index.html');
+                    });
             })
-    );
-});
-
-self.addEventListener('activate', function (event) {
-    event.waitUntil(
-        caches.keys().then(function (cacheNames) {
-            return Promise.all(
-                cacheNames.map(function (cacheName) {
-                    if (cacheName !== CACHE_NAME) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
     );
 });

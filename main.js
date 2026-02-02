@@ -1,1201 +1,751 @@
-// ============================================
-// CICLO - Menstrual Cycle Tracker
-// Professional, Clean, No Emojis
-// ============================================
+// Ciclo - Rastreador de Ciclo Menstrual
+// Toda la lógica de la aplicación
 
-// SVG Icons
-var ICONS = {
-    calendar: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
-    chevronLeft: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>',
-    chevronRight: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>',
-    sun: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>',
-    moon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>',
-    settings: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
-    download: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>',
-    upload: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>',
-    plus: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
-    trash: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>',
-    x: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
-    check: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>',
-    heart: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>',
-    activity: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>',
-    droplet: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>',
-    zap: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>',
-    alertCircle: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>',
-    info: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>',
-    target: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>',
-    clock: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>',
-    refresh: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>',
-    star: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>',
-    leaf: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>',
-    cloudRain: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16" y1="13" x2="16" y2="21"></line><line x1="8" y1="13" x2="8" y2="21"></line><line x1="12" y1="15" x2="12" y2="23"></line><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path></svg>'
-};
+(function() {
+    'use strict';
 
-// Phase Data
-var PHASES = {
-    menstrual: {
-        name: 'Fase Menstrual',
-        shortName: 'Menstrual',
-        icon: 'droplet',
-        color: 'menstrual',
-        description: 'El cuerpo está liberando el revestimiento uterino. Es normal sentirse más cansada y necesitar más descanso durante estos días.',
-        affection: 'Mayor necesidad de comprensión y apoyo emocional. Puede preferir actividades tranquilas y reconfortantes.',
-        mood: { energy: 30, mood: 40, libido: 20 },
-        symptoms: ['Cólicos', 'Fatiga', 'Sensibilidad', 'Antojos'],
-        tips: [
-            'Ofrecer bebidas calientes y comida reconfortante',
-            'Proponer actividades relajantes en casa',
-            'Tener analgésicos disponibles si los necesita',
-            'Mostrar apoyo sin esperar demasiada energía',
-            'Ser especialmente paciente y comprensivo'
-        ]
-    },
-    follicular: {
-        name: 'Fase Folicular',
-        shortName: 'Folicular',
-        icon: 'leaf',
-        color: 'follicular',
-        description: 'Los niveles de estrógeno aumentan. Período de renovación con más energía, optimismo y creatividad.',
-        affection: 'Mayor disposición para actividades sociales y proyectos nuevos. Buena receptividad emocional.',
-        mood: { energy: 70, mood: 80, libido: 60 },
-        symptoms: ['Mayor energía', 'Optimismo', 'Creatividad', 'Sociabilidad'],
-        tips: [
-            'Planificar salidas y actividades nuevas',
-            'Buen momento para ejercicio conjunto',
-            'Receptiva a conversaciones importantes',
-            'Apoyar sus proyectos y metas',
-            'Ideal para crear recuerdos juntos'
-        ]
-    },
-    ovulation: {
-        name: 'Fase de Ovulación',
-        shortName: 'Ovulación',
-        icon: 'star',
-        color: 'ovulation',
-        description: 'El óvulo es liberado. Niveles hormonales en su punto máximo. Período de máxima fertilidad.',
-        affection: 'Punto más alto de conexión emocional y física. Mayor interés en intimidad y romanticismo.',
-        mood: { energy: 90, mood: 95, libido: 95 },
-        symptoms: ['Energía alta', 'Mayor atractivo', 'Sociabilidad', 'Flujo claro'],
-        tips: [
-            'Momento ideal para citas románticas',
-            'Mayor interés en intimidad física',
-            'Sorpresas y detalles son bien recibidos',
-            'PERÍODO MÁS FÉRTIL - precaución necesaria',
-            'Planificar algo especial estos días'
-        ]
-    },
-    luteal: {
-        name: 'Fase Lútea',
-        shortName: 'Lútea',
-        icon: 'moon',
-        color: 'luteal',
-        description: 'La progesterona aumenta. El cuerpo se prepara para un posible embarazo. Energía más introspectiva.',
-        affection: 'Puede necesitar más espacio personal. Preferencia por actividades tranquilas y rutinarias.',
-        mood: { energy: 50, mood: 55, libido: 40 },
-        symptoms: ['Hinchazón leve', 'Cambios de humor', 'Antojos', 'Sensibilidad'],
-        tips: [
-            'Proponer actividades tranquilas y relajantes',
-            'Un baño o spa casero puede ayudar',
-            'Ambiente tranquilo y música relajante',
-            'Comidas nutritivas y reconfortantes',
-            'Respetar si necesita más descanso'
-        ]
-    },
-    pms: {
-        name: 'Síndrome Premenstrual',
-        shortName: 'SPM',
-        icon: 'cloudRain',
-        color: 'pms',
-        description: 'Los niveles hormonales caen drásticamente. Fase más desafiante emocionalmente antes del período.',
-        affection: 'Puede experimentar irritabilidad o tristeza. Es importante no tomar las reacciones de forma personal.',
-        mood: { energy: 25, mood: 30, libido: 25 },
-        symptoms: ['Irritabilidad', 'Ansiedad', 'Tristeza', 'Dolor de cabeza'],
-        tips: [
-            'Evitar discusiones o temas sensibles',
-            'Comida reconfortante sin comentarios',
-            'No hacer observaciones sobre su humor',
-            'Pequeños gestos significan mucho',
-            'Paciencia extra - es temporal'
-        ]
-    }
-};
-
-// Month names
-var MONTH_NAMES = [
-    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-];
-
-var WEEKDAY_NAMES = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-
-// App State
-var state = {
-    lastPeriodDate: null,
-    cycleLength: 28,
-    periodLength: 5,
-    currentMonth: new Date().getMonth(),
-    currentYear: new Date().getFullYear(),
-    periodHistory: [],
-    notes: {},
-    theme: 'light'
-};
-
-// ============================================
-// CYCLE CALCULATION FUNCTIONS
-// ============================================
-
-function calculateCycle(lastPeriodDate, cycleLength, periodLength) {
-    cycleLength = cycleLength || 28;
-    periodLength = periodLength || 5;
-
-    var startDate = new Date(lastPeriodDate);
-    var today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    var cycles = [];
-    var cycleStart = new Date(startDate);
-
-    while (cycleStart > new Date(today.getFullYear(), today.getMonth() - 3, 1)) {
-        cycleStart.setDate(cycleStart.getDate() - cycleLength);
-    }
-
-    for (var i = 0; i < 12; i++) {
-        var cycle = calculateSingleCycle(new Date(cycleStart), cycleLength, periodLength);
-        cycles.push(cycle);
-        cycleStart.setDate(cycleStart.getDate() + cycleLength);
-    }
-
-    return cycles;
-}
-
-function calculateSingleCycle(startDate, cycleLength, periodLength) {
-    var cycle = {
-        start: new Date(startDate),
-        phases: {}
-    };
-
-    cycle.phases.menstrual = {
-        start: new Date(startDate),
-        end: addDays(startDate, periodLength - 1)
-    };
-
-    var ovulationDay = cycleLength - 14;
-
-    cycle.phases.follicular = {
-        start: addDays(startDate, periodLength),
-        end: addDays(startDate, ovulationDay - 2)
-    };
-
-    cycle.phases.ovulation = {
-        start: addDays(startDate, ovulationDay - 1),
-        end: addDays(startDate, ovulationDay + 1)
-    };
-
-    cycle.fertileWindow = {
-        start: addDays(startDate, ovulationDay - 5),
-        end: addDays(startDate, ovulationDay + 1)
-    };
-
-    cycle.phases.luteal = {
-        start: addDays(startDate, ovulationDay + 2),
-        end: addDays(startDate, cycleLength - 7)
-    };
-
-    cycle.phases.pms = {
-        start: addDays(startDate, cycleLength - 6),
-        end: addDays(startDate, cycleLength - 1)
-    };
-
-    cycle.nextPeriod = addDays(startDate, cycleLength);
-
-    return cycle;
-}
-
-function addDays(date, days) {
-    var result = new Date(date);
-    result.setDate(result.getDate() + days);
-    return result;
-}
-
-function getPhaseForDate(date, cycles) {
-    var checkDate = new Date(date);
-    checkDate.setHours(0, 0, 0, 0);
-
-    for (var i = 0; i < cycles.length; i++) {
-        var cycle = cycles[i];
-        var phaseNames = Object.keys(cycle.phases);
-        for (var j = 0; j < phaseNames.length; j++) {
-            var phaseName = phaseNames[j];
-            var phase = cycle.phases[phaseName];
-            if (checkDate >= phase.start && checkDate <= phase.end) {
-                return {
-                    phase: phaseName,
-                    name: PHASES[phaseName].name,
-                    shortName: PHASES[phaseName].shortName,
-                    icon: PHASES[phaseName].icon,
-                    color: PHASES[phaseName].color,
-                    description: PHASES[phaseName].description,
-                    affection: PHASES[phaseName].affection,
-                    mood: PHASES[phaseName].mood,
-                    symptoms: PHASES[phaseName].symptoms,
-                    tips: PHASES[phaseName].tips,
-                    isFertile: checkDate >= cycle.fertileWindow.start && checkDate <= cycle.fertileWindow.end
-                };
-            }
-        }
-    }
-
-    return null;
-}
-
-function getDaysUntilNextPeriod(cycles) {
-    var today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    for (var i = 0; i < cycles.length; i++) {
-        var cycle = cycles[i];
-        if (cycle.nextPeriod > today) {
-            var diffTime = cycle.nextPeriod - today;
-            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        }
-    }
-
-    return null;
-}
-
-function getCurrentDayOfCycle(cycles) {
-    var today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    for (var i = 0; i < cycles.length; i++) {
-        var cycle = cycles[i];
-        var cycleEnd = addDays(cycle.start, state.cycleLength - 1);
-        if (today >= cycle.start && today <= cycleEnd) {
-            var diffTime = today - cycle.start;
-            return Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-        }
-    }
-
-    return null;
-}
-
-function getCurrentPhaseInfo(cycles) {
-    var today = new Date();
-    return getPhaseForDate(today, cycles);
-}
-
-// ============================================
-// STORAGE FUNCTIONS
-// ============================================
-
-function saveState() {
-    localStorage.setItem('ciclo_state', JSON.stringify(state));
-}
-
-function loadState() {
-    var saved = localStorage.getItem('ciclo_state');
-    if (saved) {
-        var parsed = JSON.parse(saved);
-        for (var key in parsed) {
-            if (parsed.hasOwnProperty(key)) {
-                state[key] = parsed[key];
-            }
-        }
-        if (state.lastPeriodDate) {
-            state.lastPeriodDate = new Date(state.lastPeriodDate);
-        }
-        state.periodHistory = (state.periodHistory || []).map(function (d) {
-            return new Date(d);
-        });
-    }
-
-    // Apply theme
-    document.documentElement.setAttribute('data-theme', state.theme);
-}
-
-function exportData() {
-    var dataStr = JSON.stringify(state, null, 2);
-    var blob = new Blob([dataStr], { type: 'application/json' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = 'ciclo-backup-' + new Date().toISOString().split('T')[0] + '.json';
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
-function importData(file) {
-    var reader = new FileReader();
-    reader.onload = function (e) {
-        try {
-            var data = JSON.parse(e.target.result);
-            for (var key in data) {
-                if (data.hasOwnProperty(key)) {
-                    state[key] = data[key];
-                }
-            }
-            if (state.lastPeriodDate) {
-                state.lastPeriodDate = new Date(state.lastPeriodDate);
-            }
-            state.periodHistory = (state.periodHistory || []).map(function (d) {
-                return new Date(d);
-            });
-            saveState();
-            renderApp();
-        } catch (err) {
-            alert('Error al importar el archivo. Asegúrate de que sea un archivo válido.');
+    // ===== Constants =====
+    const STORAGE_KEY = 'ciclo_data';
+    const PHASE_INFO = {
+        menstrual: {
+            name: 'Menstrual',
+            days: '1-5',
+            description: 'Tu cuerpo está liberando el revestimiento uterino. Es normal experimentar calambres, fatiga y cambios de humor. Escucha a tu cuerpo y descansa cuando lo necesites.',
+            symptoms: ['Calambres abdominales', 'Fatiga y cansancio', 'Dolor de espalda baja', 'Sensibilidad en los senos', 'Cambios de humor'],
+            recommendations: ['Descanso adecuado', 'Calor local para calambres', 'Hidratación abundante', 'Ejercicio suave', 'Alimentos ricos en hierro'],
+            color: 'menstrual',
+            gradient: 'menstrualGradient'
+        },
+        follicular: {
+            name: 'Folicular',
+            days: '6-13',
+            description: 'Después del período, tus niveles de estrógeno comienzan a subir. Probablemente sientas más energía, optimismo y creatividad. Es un buen momento para comenzar nuevos proyectos.',
+            symptoms: ['Aumento de energía', 'Mayor concentración', 'Piel más clara', 'Mejor estado de ánimo', 'Mayor creatividad'],
+            recommendations: ['Ejercicio intenso', 'Iniciar nuevos proyectos', 'Socializar más', 'Planificar actividades', 'Dieta equilibrada'],
+            color: 'follicular',
+            gradient: 'follicularGradient'
+        },
+        ovulation: {
+            name: 'Ovulación',
+            days: '~14',
+            description: 'Tu óvulo es liberado y estás en tu punto máximo de fertilidad. La energía y la confianza suelen estar en su punto más alto. Es cuando te sientes más social y comunicativa.',
+            symptoms: ['Máxima energía', 'Mayor deseo', 'Dolor ovulatorio leve', 'Flujo más abundante', 'Mayor confianza'],
+            recommendations: ['Actividades sociales', 'Ejercicio de alto impacto', 'Comunicación importante', 'Citas y eventos', 'Protección si no deseas embarazo'],
+            color: 'ovulation',
+            gradient: 'ovulationGradient'
+        },
+        luteal: {
+            name: 'Lútea',
+            days: '15-22',
+            description: 'Después de la ovulación, la progesterona aumenta. Puedes sentirte más introspectiva y preferir actividades tranquilas. Es momento de completar tareas pendientes.',
+            symptoms: ['Energía estable', 'Mayor apetito', 'Retención de líquidos leve', 'Sensibilidad emocional', 'Necesidad de descanso'],
+            recommendations: ['Completar proyectos', 'Ejercicio moderado', 'Alimentos nutritivos', 'Tiempo a solas', 'Preparar para el SPM'],
+            color: 'luteal',
+            gradient: 'lutealGradient'
+        },
+        pms: {
+            name: 'SPM',
+            days: '23-28',
+            description: 'Los días previos al período pueden traer síntomas premenstruales. La progesterona cae y puedes experimentar cambios de humor, antojos y fatiga. Sé amable contigo misma.',
+            symptoms: ['Cambios de humor', 'Antojos de comida', 'Hinchazón', 'Sensibilidad en senos', 'Irritabilidad'],
+            recommendations: ['Reducir cafeína y sal', 'Ejercicio ligero', 'Dormir más', 'Manejar el estrés', 'Preparar para el período'],
+            color: 'pms',
+            gradient: 'pmsGradient'
         }
     };
-    reader.readAsText(file);
-}
 
-function toggleTheme() {
-    state.theme = state.theme === 'light' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', state.theme);
-    saveState();
-    renderApp();
-}
+    const MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
-// ============================================
-// RENDER FUNCTIONS
-// ============================================
+    // ===== State =====
+    let state = {
+        lastPeriodDate: null,
+        cycleLength: 28,
+        periodLength: 5,
+        periodLogs: [],
+        theme: 'light'
+    };
 
-function renderApp() {
-    var app = document.getElementById('app');
+    let currentCalendarDate = new Date();
+    let deferredPrompt = null;
 
-    if (!state.lastPeriodDate) {
-        app.innerHTML = renderSetupView();
-        attachSetupListeners();
-    } else {
-        var cycles = calculateCycle(state.lastPeriodDate, state.cycleLength, state.periodLength);
-        app.innerHTML = renderMainView(cycles);
-        attachMainListeners(cycles);
-    }
-}
+    // ===== DOM Elements =====
+    const elements = {};
 
-function renderHeader() {
-    return '\
-    <header class="header">\
-      <div class="header__brand">\
-        <svg class="header__logo" viewBox="0 0 100 100">\
-          <defs>\
-            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">\
-              <stop offset="0%" style="stop-color:var(--color-primary)"/>\
-              <stop offset="100%" style="stop-color:var(--color-secondary)"/>\
-            </linearGradient>\
-          </defs>\
-          <circle cx="50" cy="50" r="45" fill="url(#logoGrad)"/>\
-          <path d="M50 20 A30 30 0 0 1 50 80" fill="none" stroke="white" stroke-width="4" stroke-linecap="round"/>\
-          <circle cx="50" cy="20" r="6" fill="white"/>\
-        </svg>\
-        <h1 class="header__title">Ciclo</h1>\
-      </div>\
-      <div class="header__actions">\
-        <button class="header__btn" id="theme-toggle" title="Cambiar tema">\
-          ' + (state.theme === 'light' ? ICONS.moon : ICONS.sun) + '\
-        </button>\
-      </div>\
-    </header>\
-  ';
-}
-
-function renderSetupView() {
-    var today = new Date().toISOString().split('T')[0];
-
-    return '\
-    ' + renderHeader() + '\
-    \
-    <main class="animate-slide-up">\
-      <div class="card">\
-        <div class="card__header">\
-          <div>\
-            <h2 class="card__title">\
-              <span class="card__icon">' + ICONS.calendar + '</span>\
-              Configuración Inicial\
-            </h2>\
-            <p class="card__subtitle">Ingresa la información para comenzar el seguimiento</p>\
-          </div>\
-        </div>\
-        \
-        <form id="setup-form">\
-          <div class="form-group">\
-            <label class="form-label">Fecha del primer día del último período</label>\
-            <input \
-              type="date" \
-              id="last-period" \
-              class="form-input" \
-              max="' + today + '"\
-              required\
-            />\
-            <p class="form-hint">El primer día es cuando comienza el sangrado real, no el manchado previo.</p>\
-          </div>\
-          \
-          <div class="form-group">\
-            <label class="form-label">Duración promedio del ciclo</label>\
-            <div class="form-range-wrapper">\
-              <input \
-                type="range" \
-                id="cycle-length" \
-                class="form-range"\
-                min="21" \
-                max="35" \
-                value="28"\
-              />\
-              <span class="form-range-value"><span id="cycle-length-value">28</span> días</span>\
-            </div>\
-            <p class="form-hint">El ciclo promedio es de 28 días (rango normal: 21-35 días)</p>\
-          </div>\
-          \
-          <div class="form-group">\
-            <label class="form-label">Duración promedio del período</label>\
-            <div class="form-range-wrapper">\
-              <input \
-                type="range" \
-                id="period-length" \
-                class="form-range"\
-                min="3" \
-                max="7" \
-                value="5"\
-              />\
-              <span class="form-range-value"><span id="period-length-value">5</span> días</span>\
-            </div>\
-            <p class="form-hint">Días de sangrado activo</p>\
-          </div>\
-          \
-          <button type="submit" class="btn btn-primary btn-full">\
-            ' + ICONS.check + '\
-            Comenzar seguimiento\
-          </button>\
-        </form>\
-      </div>\
-      \
-      <div class="card animate-slide-up stagger-2">\
-        <h3 class="card__title">\
-          <span class="card__icon">' + ICONS.info + '</span>\
-          Acerca de esta aplicación\
-        </h3>\
-        <p style="color: var(--color-text-secondary); line-height: 1.7;">\
-          Esta aplicación te ayuda a entender y anticipar las diferentes fases del ciclo menstrual. \
-          Conocer estas fases permite comprender mejor los cambios de energía, humor y necesidades \
-          emocionales a lo largo del mes. Toda la información se guarda localmente en tu dispositivo.\
-        </p>\
-      </div>\
-    </main>\
-  ';
-}
-
-function renderMainView(cycles) {
-    var currentPhase = getCurrentPhaseInfo(cycles);
-    var daysUntilPeriod = getDaysUntilNextPeriod(cycles);
-    var currentDay = getCurrentDayOfCycle(cycles);
-    var today = new Date().toISOString().split('T')[0];
-
-    return '\
-    ' + renderHeader() + '\
-    \
-    <main>\
-      ' + renderCycleVisualization(currentDay, currentPhase) + '\
-      \
-      ' + (daysUntilPeriod !== null ? renderCountdown(daysUntilPeriod) : '') + '\
-      \
-      ' + renderStats(cycles) + '\
-      \
-      ' + (currentPhase ? renderPhasePanel(currentPhase) : '') + '\
-      \
-      ' + renderCalendar(cycles) + '\
-      \
-      ' + renderLegend() + '\
-      \
-      ' + renderHistorySection(today) + '\
-      \
-      ' + renderSettingsSection() + '\
-    </main>\
-  ';
-}
-
-function renderCycleVisualization(currentDay, currentPhase) {
-    if (!currentDay) return '';
-
-    var progress = (currentDay / state.cycleLength) * 100;
-    var circumference = 2 * Math.PI * 110;
-    var offset = circumference - (progress / 100) * circumference;
-
-    var phaseColor = currentPhase ? 'var(--color-' + currentPhase.color + ')' : 'var(--color-primary)';
-
-    var phaseSegments = Object.keys(PHASES).map(function (phase) {
-        var isActive = currentPhase && currentPhase.phase === phase;
-        return '<div class="phase-indicator__segment phase-indicator__segment--' + phase + (isActive ? ' phase-indicator__segment--active' : '') + '"></div>';
-    }).join('');
-
-    return '\
-    <div class="card animate-fade-in">\
-      <div class="cycle-ring">\
-        <svg class="cycle-ring__svg" viewBox="0 0 280 280">\
-          <circle class="cycle-ring__bg" cx="140" cy="140" r="110"/>\
-          <circle \
-            class="cycle-ring__progress" \
-            cx="140" cy="140" r="110"\
-            stroke="' + phaseColor + '"\
-            stroke-dasharray="' + circumference + '"\
-            stroke-dashoffset="' + offset + '"\
-          />\
-        </svg>\
-        <div class="cycle-ring__center">\
-          <div class="cycle-ring__day" style="color: ' + phaseColor + '">Día ' + currentDay + '</div>\
-          <div class="cycle-ring__label">de ' + state.cycleLength + '</div>\
-          ' + (currentPhase ? '\
-            <div class="cycle-ring__phase" style="background: var(--color-' + currentPhase.color + '-bg); color: var(--color-' + currentPhase.color + ');">\
-              ' + currentPhase.shortName + '\
-            </div>\
-          ' : '') + '\
-        </div>\
-      </div>\
-      \
-      <div class="phase-indicator">\
-        ' + phaseSegments + '\
-      </div>\
-    </div>\
-  ';
-}
-
-function renderCountdown(days) {
-    var note = '';
-    if (days <= 3) {
-        note = 'Se aproxima el próximo período';
-    } else if (days <= 7) {
-        note = 'Aproximadamente una semana';
-    } else {
-        note = 'Estimación basada en el ciclo promedio';
+    // ===== Initialize =====
+    function init() {
+        cacheElements();
+        loadData();
+        setupEventListeners();
+        updateUI();
+        registerServiceWorker();
     }
 
-    return '\
-    <div class="countdown animate-slide-up stagger-1">\
-      <p class="countdown__label">Próximo período estimado en</p>\
-      <div class="countdown__value">\
-        <span>' + days + '</span>\
-        <span class="countdown__unit">' + (days === 1 ? 'día' : 'días') + '</span>\
-      </div>\
-      <p class="countdown__note">' + note + '</p>\
-    </div>\
-  ';
-}
-
-function renderStats(cycles) {
-    var today = new Date();
-    var currentPhase = getCurrentPhaseInfo(cycles);
-
-    var daysUntilOvulation = null;
-    for (var i = 0; i < cycles.length; i++) {
-        var cycle = cycles[i];
-        if (cycle.phases.ovulation.start > today) {
-            daysUntilOvulation = Math.ceil((cycle.phases.ovulation.start - today) / (1000 * 60 * 60 * 24));
-            break;
-        }
+    function cacheElements() {
+        elements.themeToggle = document.getElementById('themeToggle');
+        elements.menuToggle = document.getElementById('menuToggle');
+        elements.settingsPanel = document.getElementById('settingsPanel');
+        elements.settingsOverlay = document.getElementById('settingsOverlay');
+        elements.closeSettings = document.getElementById('closeSettings');
+        elements.currentDay = document.getElementById('currentDay');
+        elements.currentPhase = document.getElementById('currentPhase');
+        elements.progressRing = document.getElementById('progressRing');
+        elements.fertileWindow = document.getElementById('fertileWindow');
+        elements.ovulationDate = document.getElementById('ovulationDate');
+        elements.nextPeriod = document.getElementById('nextPeriod');
+        elements.phaseTitle = document.getElementById('phaseTitle');
+        elements.phaseBadge = document.getElementById('phaseBadge');
+        elements.phaseDescription = document.getElementById('phaseDescription');
+        elements.symptomsList = document.getElementById('symptomsList');
+        elements.recommendationsList = document.getElementById('recommendationsList');
+        elements.calendarTitle = document.getElementById('calendarTitle');
+        elements.calendarGrid = document.getElementById('calendarGrid');
+        elements.prevMonth = document.getElementById('prevMonth');
+        elements.nextMonth = document.getElementById('nextMonth');
+        elements.periodLogList = document.getElementById('periodLogList');
+        elements.addPeriodBtn = document.getElementById('addPeriodBtn');
+        elements.addPeriodModal = document.getElementById('addPeriodModal');
+        elements.modalOverlay = document.getElementById('modalOverlay');
+        elements.closeModal = document.getElementById('closeModal');
+        elements.cancelModal = document.getElementById('cancelModal');
+        elements.savePeriod = document.getElementById('savePeriod');
+        elements.newPeriodDate = document.getElementById('newPeriodDate');
+        elements.lastPeriodDate = document.getElementById('lastPeriodDate');
+        elements.cycleLength = document.getElementById('cycleLength');
+        elements.cycleLengthValue = document.getElementById('cycleLengthValue');
+        elements.periodLength = document.getElementById('periodLength');
+        elements.periodLengthValue = document.getElementById('periodLengthValue');
+        elements.exportData = document.getElementById('exportData');
+        elements.importData = document.getElementById('importData');
+        elements.importFile = document.getElementById('importFile');
+        elements.clearData = document.getElementById('clearData');
+        elements.toast = document.getElementById('toast');
+        elements.toastMessage = document.getElementById('toastMessage');
+        elements.installPrompt = document.getElementById('installPrompt');
+        elements.installApp = document.getElementById('installApp');
+        elements.dismissInstall = document.getElementById('dismissInstall');
     }
 
-    var isFertile = false;
-    for (var j = 0; j < cycles.length; j++) {
-        var c = cycles[j];
-        if (today >= c.fertileWindow.start && today <= c.fertileWindow.end) {
-            isFertile = true;
-            break;
-        }
-    }
+    function setupEventListeners() {
+        // Theme toggle
+        elements.themeToggle.addEventListener('click', toggleTheme);
 
-    return '\
-    <div class="stats-grid animate-slide-up stagger-2">\
-      <div class="stat-card">\
-        <div class="stat-card__icon">' + ICONS.activity + '</div>\
-        <div class="stat-card__value">' + (currentPhase ? currentPhase.shortName : '—') + '</div>\
-        <div class="stat-card__label">Fase actual</div>\
-      </div>\
-      \
-      <div class="stat-card">\
-        <div class="stat-card__icon">' + ICONS.refresh + '</div>\
-        <div class="stat-card__value">' + state.cycleLength + '</div>\
-        <div class="stat-card__label">Días del ciclo</div>\
-      </div>\
-      \
-      <div class="stat-card">\
-        <div class="stat-card__icon">' + (isFertile ? ICONS.alertCircle : ICONS.check) + '</div>\
-        <div class="stat-card__value">' + (isFertile ? 'Sí' : 'No') + '</div>\
-        <div class="stat-card__label">Período fértil</div>\
-      </div>\
-      \
-      <div class="stat-card">\
-        <div class="stat-card__icon">' + ICONS.target + '</div>\
-        <div class="stat-card__value">' + (daysUntilOvulation !== null ? daysUntilOvulation : '—') + '</div>\
-        <div class="stat-card__label">Días p/ ovulación</div>\
-      </div>\
-    </div>\
-  ';
-}
+        // Settings panel
+        elements.menuToggle.addEventListener('click', () => togglePanel(true));
+        elements.closeSettings.addEventListener('click', () => togglePanel(false));
+        elements.settingsOverlay.addEventListener('click', () => togglePanel(false));
 
-function renderPhasePanel(phase) {
-    var symptomsHtml = phase.symptoms.map(function (s) {
-        return '<span class="symptom-tag">' + s + '</span>';
-    }).join('');
+        // Settings inputs
+        elements.lastPeriodDate.addEventListener('change', handleLastPeriodChange);
+        elements.cycleLength.addEventListener('input', handleCycleLengthChange);
+        elements.periodLength.addEventListener('input', handlePeriodLengthChange);
 
-    var tipsHtml = phase.tips.map(function (tip) {
-        return '\
-      <div class="tip-item">\
-        <span class="tip-item__icon">' + ICONS.check + '</span>\
-        <p class="tip-item__text">' + tip + '</p>\
-      </div>\
-    ';
-    }).join('');
+        // Calendar navigation
+        elements.prevMonth.addEventListener('click', () => navigateMonth(-1));
+        elements.nextMonth.addEventListener('click', () => navigateMonth(1));
 
-    return '\
-    <div class="phase-panel animate-slide-up stagger-3">\
-      <div class="phase-panel__header">\
-        <div class="phase-panel__badge phase-panel__badge--' + phase.color + '">\
-          ' + ICONS[phase.icon] + '\
-        </div>\
-        <div>\
-          <h2 class="phase-panel__title">' + phase.name + '</h2>\
-          <p class="phase-panel__subtitle">Información de la fase actual</p>\
-        </div>\
-      </div>\
-      \
-      <div class="phase-panel__grid">\
-        <div class="phase-panel__section">\
-          <h4 class="phase-panel__section-title">Descripción</h4>\
-          <p class="phase-panel__section-text">' + phase.description + '</p>\
-        </div>\
-        \
-        <div class="phase-panel__section">\
-          <h4 class="phase-panel__section-title">Nivel de afecto</h4>\
-          <p class="phase-panel__section-text">' + phase.affection + '</p>\
-        </div>\
-        \
-        <div class="phase-panel__section">\
-          <h4 class="phase-panel__section-title">Niveles estimados</h4>\
-          <div class="mood-bars">\
-            <div class="mood-bar">\
-              <div class="mood-bar__header">\
-                <span>Energía</span>\
-                <span>' + phase.mood.energy + '%</span>\
-              </div>\
-              <div class="mood-bar__track">\
-                <div class="mood-bar__fill mood-bar__fill--energy" style="width: ' + phase.mood.energy + '%"></div>\
-              </div>\
-            </div>\
-            <div class="mood-bar">\
-              <div class="mood-bar__header">\
-                <span>Estado de ánimo</span>\
-                <span>' + phase.mood.mood + '%</span>\
-              </div>\
-              <div class="mood-bar__track">\
-                <div class="mood-bar__fill mood-bar__fill--mood" style="width: ' + phase.mood.mood + '%"></div>\
-              </div>\
-            </div>\
-            <div class="mood-bar">\
-              <div class="mood-bar__header">\
-                <span>Libido</span>\
-                <span>' + phase.mood.libido + '%</span>\
-              </div>\
-              <div class="mood-bar__track">\
-                <div class="mood-bar__fill mood-bar__fill--libido" style="width: ' + phase.mood.libido + '%"></div>\
-              </div>\
-            </div>\
-          </div>\
-        </div>\
-        \
-        <div class="phase-panel__section">\
-          <h4 class="phase-panel__section-title">Síntomas comunes</h4>\
-          <div class="symptoms-tags">\
-            ' + symptomsHtml + '\
-          </div>\
-        </div>\
-      </div>\
-      \
-      <div class="phase-panel__section" style="margin-top: var(--space-lg);">\
-        <h4 class="phase-panel__section-title">Recomendaciones</h4>\
-        <div class="tips-list">\
-          ' + tipsHtml + '\
-        </div>\
-      </div>\
-    </div>\
-  ';
-}
+        // Add period modal
+        elements.addPeriodBtn.addEventListener('click', () => toggleModal(true));
+        elements.closeModal.addEventListener('click', () => toggleModal(false));
+        elements.cancelModal.addEventListener('click', () => toggleModal(false));
+        elements.modalOverlay.addEventListener('click', () => toggleModal(false));
+        elements.savePeriod.addEventListener('click', savePeriod);
 
-function renderCalendar(cycles) {
-    var year = state.currentYear;
-    var month = state.currentMonth;
+        // Data management
+        elements.exportData.addEventListener('click', exportData);
+        elements.importData.addEventListener('click', () => elements.importFile.click());
+        elements.importFile.addEventListener('change', importData);
+        elements.clearData.addEventListener('click', clearData);
 
-    var firstDay = new Date(year, month, 1);
-    var lastDay = new Date(year, month + 1, 0);
-    var startingDay = firstDay.getDay();
-    var totalDays = lastDay.getDate();
+        // Install prompt
+        elements.installApp.addEventListener('click', installApp);
+        elements.dismissInstall.addEventListener('click', dismissInstall);
 
-    var today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    var daysHTML = '';
-
-    for (var i = 0; i < startingDay; i++) {
-        daysHTML += '<div class="calendar__day calendar__day--empty"></div>';
-    }
-
-    for (var day = 1; day <= totalDays; day++) {
-        var date = new Date(year, month, day);
-        date.setHours(0, 0, 0, 0);
-
-        var phaseInfo = getPhaseForDate(date, cycles);
-        var isToday = date.getTime() === today.getTime();
-
-        var classes = ['calendar__day'];
-
-        if (isToday) classes.push('calendar__day--today');
-
-        if (phaseInfo) {
-            classes.push('calendar__day--' + phaseInfo.phase);
-            if (phaseInfo.isFertile) {
-                classes.push('calendar__day--fertile');
-            }
-        }
-
-        daysHTML += '\
-      <div class="' + classes.join(' ') + '" data-date="' + date.toISOString() + '">\
-        <span>' + day + '</span>\
-      </div>\
-    ';
-    }
-
-    var weekdaysHTML = WEEKDAY_NAMES.map(function (day) {
-        return '<div class="calendar__weekday">' + day + '</div>';
-    }).join('');
-
-    return '\
-    <div class="calendar animate-slide-up stagger-4">\
-      <div class="calendar__header">\
-        <div class="calendar__nav">\
-          <button class="calendar__nav-btn" id="prev-month">\
-            ' + ICONS.chevronLeft + '\
-          </button>\
-          <button class="calendar__nav-btn" id="next-month">\
-            ' + ICONS.chevronRight + '\
-          </button>\
-        </div>\
-        <h3 class="calendar__month-year">' + MONTH_NAMES[month] + ' ' + year + '</h3>\
-      </div>\
-      \
-      <div class="calendar__weekdays">\
-        ' + weekdaysHTML + '\
-      </div>\
-      \
-      <div class="calendar__days">\
-        ' + daysHTML + '\
-      </div>\
-    </div>\
-  ';
-}
-
-function renderLegend() {
-    return '\
-    <div class="legend">\
-      <div class="legend__item">\
-        <div class="legend__color legend__color--menstrual"></div>\
-        <span>Menstruación</span>\
-      </div>\
-      <div class="legend__item">\
-        <div class="legend__color legend__color--follicular"></div>\
-        <span>Folicular</span>\
-      </div>\
-      <div class="legend__item">\
-        <div class="legend__color legend__color--ovulation"></div>\
-        <span>Ovulación</span>\
-      </div>\
-      <div class="legend__item">\
-        <div class="legend__color legend__color--luteal"></div>\
-        <span>Lútea</span>\
-      </div>\
-      <div class="legend__item">\
-        <div class="legend__color legend__color--pms"></div>\
-        <span>SPM</span>\
-      </div>\
-    </div>\
-  ';
-}
-
-function renderHistorySection(today) {
-    var historyHtml = '';
-    if (state.periodHistory.length > 0) {
-        var items = state.periodHistory.slice().reverse().map(function (date, index) {
-            return '\
-        <div class="history-item">\
-          <div class="history-item__date">\
-            <span class="history-item__icon">' + ICONS.calendar + '</span>\
-            ' + formatDate(date) + '\
-          </div>\
-          <button class="history-item__delete" data-index="' + (state.periodHistory.length - 1 - index) + '">\
-            ' + ICONS.x + '\
-          </button>\
-        </div>\
-      ';
-        }).join('');
-
-        historyHtml = '\
-      <div class="settings-section">\
-        <h4 class="card__title" style="font-size: var(--font-size-sm); margin-bottom: var(--space-md);">\
-          Historial de registros\
-        </h4>\
-        <div class="history-list">\
-          ' + items + '\
-        </div>\
-      </div>\
-    ';
-    }
-
-    return '\
-    <div class="card">\
-      <div class="card__header">\
-        <div>\
-          <h3 class="card__title">\
-            <span class="card__icon">' + ICONS.plus + '</span>\
-            Registrar período\
-          </h3>\
-          <p class="card__subtitle">Añade un nuevo registro cuando inicie el período</p>\
-        </div>\
-      </div>\
-      \
-      <div class="form-group">\
-        <label class="form-label">Fecha de inicio</label>\
-        <input \
-          type="date" \
-          id="new-period-date" \
-          class="form-input" \
-          max="' + today + '"\
-        />\
-      </div>\
-      \
-      <button id="add-period-btn" class="btn btn-primary btn-full mb-lg">\
-        ' + ICONS.plus + '\
-        Registrar\
-      </button>\
-      \
-      ' + historyHtml + '\
-    </div>\
-  ';
-}
-
-function renderSettingsSection() {
-    return '\
-    <div class="card">\
-      <div class="card__header">\
-        <div>\
-          <h3 class="card__title">\
-            <span class="card__icon">' + ICONS.settings + '</span>\
-            Ajustes\
-          </h3>\
-        </div>\
-      </div>\
-      \
-      <div class="form-group">\
-        <label class="form-label">Duración del ciclo</label>\
-        <div class="form-range-wrapper">\
-          <input \
-            type="range" \
-            id="adjust-cycle" \
-            class="form-range"\
-            min="21" \
-            max="35" \
-            value="' + state.cycleLength + '"\
-          />\
-          <span class="form-range-value">' + state.cycleLength + ' días</span>\
-        </div>\
-      </div>\
-      \
-      <div class="form-group">\
-        <label class="form-label">Duración del período</label>\
-        <div class="form-range-wrapper">\
-          <input \
-            type="range" \
-            id="adjust-period" \
-            class="form-range"\
-            min="3" \
-            max="7" \
-            value="' + state.periodLength + '"\
-          />\
-          <span class="form-range-value">' + state.periodLength + ' días</span>\
-        </div>\
-      </div>\
-      \
-      <div class="settings-section">\
-        <h4 style="font-size: var(--font-size-sm); font-weight: 600; color: var(--color-text-secondary); margin-bottom: var(--space-md);">\
-          Datos\
-        </h4>\
-        <div class="data-actions">\
-          <button id="export-btn" class="btn btn-secondary">\
-            ' + ICONS.download + '\
-            Exportar\
-          </button>\
-          <label class="btn btn-secondary" style="cursor: pointer;">\
-            ' + ICONS.upload + '\
-            Importar\
-            <input type="file" id="import-input" accept=".json" style="display: none;" />\
-          </label>\
-          <button id="reset-btn" class="btn btn-danger">\
-            ' + ICONS.trash + '\
-            Reiniciar\
-          </button>\
-        </div>\
-      </div>\
-    </div>\
-  ';
-}
-
-function formatDate(date) {
-    var d = new Date(date);
-    return d.getDate() + ' de ' + MONTH_NAMES[d.getMonth()] + ' ' + d.getFullYear();
-}
-
-// ============================================
-// EVENT LISTENERS
-// ============================================
-
-function attachSetupListeners() {
-    // Theme toggle
-    var themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
-    }
-
-    // Range sliders
-    var cycleLengthSlider = document.getElementById('cycle-length');
-    var periodLengthSlider = document.getElementById('period-length');
-
-    if (cycleLengthSlider) {
-        cycleLengthSlider.addEventListener('input', function (e) {
-            document.getElementById('cycle-length-value').textContent = e.target.value;
-        });
-    }
-
-    if (periodLengthSlider) {
-        periodLengthSlider.addEventListener('input', function (e) {
-            document.getElementById('period-length-value').textContent = e.target.value;
-        });
-    }
-
-    // Form submission
-    var setupForm = document.getElementById('setup-form');
-    if (setupForm) {
-        setupForm.addEventListener('submit', function (e) {
+        // PWA install event
+        window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
+            deferredPrompt = e;
+            setTimeout(() => {
+                elements.installPrompt.classList.add('active');
+            }, 3000);
+        });
+    }
 
-            var lastPeriod = document.getElementById('last-period').value;
-            var cycleLength = parseInt(document.getElementById('cycle-length').value);
-            var periodLength = parseInt(document.getElementById('period-length').value);
-
-            if (lastPeriod) {
-                state.lastPeriodDate = new Date(lastPeriod);
-                state.cycleLength = cycleLength;
-                state.periodLength = periodLength;
-                state.periodHistory = [new Date(lastPeriod)];
-
-                saveState();
-                renderApp();
+    // ===== Data Management =====
+    function loadData() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                state = { ...state, ...data };
+                if (state.lastPeriodDate) {
+                    state.lastPeriodDate = new Date(state.lastPeriodDate);
+                }
+                state.periodLogs = (state.periodLogs || []).map(log => ({
+                    ...log,
+                    date: new Date(log.date)
+                }));
+            } catch (e) {
+                console.error('Error loading data:', e);
             }
-        });
-    }
-}
-
-function attachMainListeners(cycles) {
-    // Theme toggle
-    var themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
-    }
-
-    // Calendar navigation
-    var prevMonth = document.getElementById('prev-month');
-    if (prevMonth) {
-        prevMonth.addEventListener('click', function () {
-            state.currentMonth--;
-            if (state.currentMonth < 0) {
-                state.currentMonth = 11;
-                state.currentYear--;
-            }
-            renderApp();
-        });
-    }
-
-    var nextMonth = document.getElementById('next-month');
-    if (nextMonth) {
-        nextMonth.addEventListener('click', function () {
-            state.currentMonth++;
-            if (state.currentMonth > 11) {
-                state.currentMonth = 0;
-                state.currentYear++;
-            }
-            renderApp();
-        });
-    }
-
-    // Calendar day clicks
-    var calendarDays = document.querySelectorAll('.calendar__day:not(.calendar__day--empty)');
-    calendarDays.forEach(function (day) {
-        day.addEventListener('click', function () {
-            var date = new Date(day.dataset.date);
-            var phaseInfo = getPhaseForDate(date, cycles);
-
-            if (phaseInfo) {
-                showDayModal(date, phaseInfo);
-            }
-        });
-    });
-
-    // Add new period
-    var addPeriodBtn = document.getElementById('add-period-btn');
-    if (addPeriodBtn) {
-        addPeriodBtn.addEventListener('click', function () {
-            var dateInput = document.getElementById('new-period-date');
-            if (dateInput.value) {
-                var newDate = new Date(dateInput.value);
-                state.lastPeriodDate = newDate;
-                state.periodHistory.push(newDate);
-                saveState();
-                renderApp();
-            }
-        });
-    }
-
-    // Delete history item
-    var deleteButtons = document.querySelectorAll('.history-item__delete');
-    deleteButtons.forEach(function (btn) {
-        btn.addEventListener('click', function (e) {
-            var index = parseInt(e.currentTarget.dataset.index);
-            state.periodHistory.splice(index, 1);
-
-            if (state.periodHistory.length > 0) {
-                state.lastPeriodDate = state.periodHistory[state.periodHistory.length - 1];
-            } else {
-                state.lastPeriodDate = null;
-            }
-
-            saveState();
-            renderApp();
-        });
-    });
-
-    // Adjust cycle length
-    var adjustCycle = document.getElementById('adjust-cycle');
-    if (adjustCycle) {
-        adjustCycle.addEventListener('change', function (e) {
-            state.cycleLength = parseInt(e.target.value);
-            saveState();
-            renderApp();
-        });
-    }
-
-    // Adjust period length
-    var adjustPeriod = document.getElementById('adjust-period');
-    if (adjustPeriod) {
-        adjustPeriod.addEventListener('change', function (e) {
-            state.periodLength = parseInt(e.target.value);
-            saveState();
-            renderApp();
-        });
-    }
-
-    // Export data
-    var exportBtn = document.getElementById('export-btn');
-    if (exportBtn) {
-        exportBtn.addEventListener('click', exportData);
-    }
-
-    // Import data
-    var importInput = document.getElementById('import-input');
-    if (importInput) {
-        importInput.addEventListener('change', function (e) {
-            if (e.target.files.length > 0) {
-                importData(e.target.files[0]);
-            }
-        });
-    }
-
-    // Reset button
-    var resetBtn = document.getElementById('reset-btn');
-    if (resetBtn) {
-        resetBtn.addEventListener('click', function () {
-            if (confirm('¿Confirmas que deseas eliminar todos los datos? Esta acción no se puede deshacer.')) {
-                localStorage.removeItem('ciclo_state');
-                state = {
-                    lastPeriodDate: null,
-                    cycleLength: 28,
-                    periodLength: 5,
-                    currentMonth: new Date().getMonth(),
-                    currentYear: new Date().getFullYear(),
-                    periodHistory: [],
-                    notes: {},
-                    theme: state.theme
-                };
-                renderApp();
-            }
-        });
-    }
-}
-
-function showDayModal(date, phaseInfo) {
-    var modal = document.createElement('div');
-    modal.className = 'modal-overlay modal-overlay--active';
-    modal.innerHTML = '\
-    <div class="modal">\
-      <button class="modal__close">' + ICONS.x + '</button>\
-      \
-      <div class="modal__header">\
-        <h3 class="modal__title">' + formatDate(date) + '</h3>\
-        <p class="modal__subtitle">' + phaseInfo.name + '</p>\
-      </div>\
-      \
-      <div class="phase-panel__section mb-md">\
-        <h4 class="phase-panel__section-title">Descripción</h4>\
-        <p class="phase-panel__section-text">' + phaseInfo.description + '</p>\
-      </div>\
-      \
-      <div class="phase-panel__section mb-md">\
-        <h4 class="phase-panel__section-title">Nivel de afecto</h4>\
-        <p class="phase-panel__section-text">' + phaseInfo.affection + '</p>\
-      </div>\
-      \
-      ' + (phaseInfo.isFertile ? '\
-        <div class="phase-panel__section fertile-warning">\
-          <h4 class="phase-panel__section-title fertile-warning__title">\
-            <span class="fertile-warning__icon">' + ICONS.alertCircle + '</span>\
-            Período fértil\
-          </h4>\
-          <p class="phase-panel__section-text">\
-            Alta probabilidad de embarazo. Tomar precauciones si no se desea concebir.\
-          </p>\
-        </div>\
-      ' : '') + '\
-    </div>\
-  ';
-
-    document.body.appendChild(modal);
-
-    modal.addEventListener('click', function (e) {
-        if (e.target === modal || e.target.closest('.modal__close')) {
-            modal.classList.remove('modal-overlay--active');
-            setTimeout(function () {
-                modal.remove();
-            }, 250);
         }
-    });
-}
+        
+        // Apply saved theme
+        document.documentElement.setAttribute('data-theme', state.theme);
+    }
 
-// ============================================
-// INITIALIZE APP
-// ============================================
+    function saveData() {
+        const dataToSave = {
+            ...state,
+            lastPeriodDate: state.lastPeriodDate ? state.lastPeriodDate.toISOString() : null,
+            periodLogs: state.periodLogs.map(log => ({
+                ...log,
+                date: log.date.toISOString()
+            }))
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+    }
 
-loadState();
-renderApp();
+    // ===== Cycle Calculations =====
+    function getCycleDay() {
+        if (!state.lastPeriodDate) return null;
+        const today = new Date();
+        const diffTime = today - state.lastPeriodDate;
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        
+        // Handle cycles that have passed
+        if (diffDays > state.cycleLength) {
+            return ((diffDays - 1) % state.cycleLength) + 1;
+        }
+        return diffDays;
+    }
 
-// Register Service Worker for PWA
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-        navigator.serviceWorker.register('sw.js').catch(function () {
-            // Service worker registration failed, app still works
-        });
-    });
-}
+    function getPhaseForDay(day) {
+        if (!day || day < 1) return null;
+        
+        const ovulationDay = state.cycleLength - 14;
+        const pmsStart = state.cycleLength - 6;
+
+        if (day <= state.periodLength) return 'menstrual';
+        if (day < ovulationDay - 2) return 'follicular';
+        if (day >= ovulationDay - 2 && day <= ovulationDay + 1) return 'ovulation';
+        if (day > ovulationDay + 1 && day < pmsStart) return 'luteal';
+        return 'pms';
+    }
+
+    function getFertileWindow() {
+        if (!state.lastPeriodDate) return null;
+        
+        const ovulationDay = state.cycleLength - 14;
+        const fertileStart = ovulationDay - 5;
+        const fertileEnd = ovulationDay + 1;
+        
+        return { start: fertileStart, end: fertileEnd };
+    }
+
+    function getOvulationDate() {
+        if (!state.lastPeriodDate) return null;
+        
+        const ovulationDay = state.cycleLength - 14;
+        const ovulationDate = new Date(state.lastPeriodDate);
+        ovulationDate.setDate(ovulationDate.getDate() + ovulationDay - 1);
+        
+        return ovulationDate;
+    }
+
+    function getNextPeriodDate() {
+        if (!state.lastPeriodDate) return null;
+        
+        const nextPeriod = new Date(state.lastPeriodDate);
+        const today = new Date();
+        
+        while (nextPeriod <= today) {
+            nextPeriod.setDate(nextPeriod.getDate() + state.cycleLength);
+        }
+        
+        return nextPeriod;
+    }
+
+    function getDaysUntil(date) {
+        if (!date) return null;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const target = new Date(date);
+        target.setHours(0, 0, 0, 0);
+        const diffTime = target - today;
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+
+    // ===== UI Updates =====
+    function updateUI() {
+        updateCycleRing();
+        updateQuickStats();
+        updatePhaseInfo();
+        updateCalendar();
+        updatePeriodLog();
+        updateSettings();
+    }
+
+    function updateCycleRing() {
+        const day = getCycleDay();
+        const phase = getPhaseForDay(day);
+        
+        if (day && phase) {
+            elements.currentDay.textContent = day;
+            elements.currentPhase.textContent = PHASE_INFO[phase].name;
+            
+            // Set phase color on badge
+            elements.currentPhase.style.background = `var(--color-${phase})`;
+            elements.currentPhase.style.color = 'white';
+            
+            // Update ring progress
+            const progress = day / state.cycleLength;
+            const circumference = 2 * Math.PI * 85; // radius = 85
+            const offset = circumference * (1 - progress);
+            elements.progressRing.style.strokeDasharray = circumference;
+            elements.progressRing.style.strokeDashoffset = offset;
+            elements.progressRing.style.stroke = `url(#${PHASE_INFO[phase].gradient})`;
+        } else {
+            elements.currentDay.textContent = '--';
+            elements.currentPhase.textContent = 'Sin datos';
+            elements.currentPhase.style.background = '';
+            elements.currentPhase.style.color = '';
+            elements.progressRing.style.strokeDashoffset = 534;
+        }
+    }
+
+    function updateQuickStats() {
+        const fertile = getFertileWindow();
+        const ovulation = getOvulationDate();
+        const nextPeriod = getNextPeriodDate();
+        
+        if (fertile) {
+            const cycleDay = getCycleDay();
+            if (cycleDay >= fertile.start && cycleDay <= fertile.end) {
+                elements.fertileWindow.textContent = 'Ahora';
+            } else if (cycleDay < fertile.start) {
+                elements.fertileWindow.textContent = `En ${fertile.start - cycleDay} días`;
+            } else {
+                elements.fertileWindow.textContent = 'Pasada';
+            }
+        } else {
+            elements.fertileWindow.textContent = '--';
+        }
+
+        if (ovulation) {
+            const daysUntil = getDaysUntil(ovulation);
+            if (daysUntil === 0) {
+                elements.ovulationDate.textContent = 'Hoy';
+            } else if (daysUntil > 0) {
+                elements.ovulationDate.textContent = `En ${daysUntil} días`;
+            } else {
+                elements.ovulationDate.textContent = formatDate(ovulation);
+            }
+        } else {
+            elements.ovulationDate.textContent = '--';
+        }
+
+        if (nextPeriod) {
+            const daysUntil = getDaysUntil(nextPeriod);
+            if (daysUntil === 0) {
+                elements.nextPeriod.textContent = 'Hoy';
+            } else if (daysUntil === 1) {
+                elements.nextPeriod.textContent = 'Mañana';
+            } else {
+                elements.nextPeriod.textContent = `En ${daysUntil} días`;
+            }
+        } else {
+            elements.nextPeriod.textContent = '--';
+        }
+    }
+
+    function updatePhaseInfo() {
+        const day = getCycleDay();
+        const phase = getPhaseForDay(day);
+        
+        if (phase) {
+            const info = PHASE_INFO[phase];
+            elements.phaseTitle.textContent = 'Fase actual';
+            elements.phaseBadge.textContent = `${info.name} - Días ${info.days}`;
+            elements.phaseBadge.style.background = `var(--color-${phase})`;
+            elements.phaseDescription.textContent = info.description;
+            
+            elements.symptomsList.innerHTML = info.symptoms.map(s => `<li>${s}</li>`).join('');
+            elements.recommendationsList.innerHTML = info.recommendations.map(r => `<li>${r}</li>`).join('');
+        } else {
+            elements.phaseTitle.textContent = 'Configura tu ciclo';
+            elements.phaseBadge.textContent = 'Sin datos';
+            elements.phaseBadge.style.background = '';
+            elements.phaseDescription.textContent = 'Ingresa la fecha del primer día de tu último período en la configuración para comenzar a rastrear tu ciclo.';
+            elements.symptomsList.innerHTML = '<li>--</li>';
+            elements.recommendationsList.innerHTML = '<li>--</li>';
+        }
+    }
+
+    function updateCalendar() {
+        const year = currentCalendarDate.getFullYear();
+        const month = currentCalendarDate.getMonth();
+        
+        elements.calendarTitle.textContent = `${MONTHS[month]} ${year}`;
+        
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const startingDay = firstDay.getDay();
+        const totalDays = lastDay.getDate();
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        let html = '';
+        
+        // Previous month days
+        const prevMonth = new Date(year, month, 0);
+        const prevMonthDays = prevMonth.getDate();
+        for (let i = startingDay - 1; i >= 0; i--) {
+            const day = prevMonthDays - i;
+            const date = new Date(year, month - 1, day);
+            const phase = getPhaseForDate(date);
+            const classes = ['calendar-day', 'other-month'];
+            if (phase) classes.push(phase);
+            html += `<div class="${classes.join(' ')}">${day}</div>`;
+        }
+        
+        // Current month days
+        for (let day = 1; day <= totalDays; day++) {
+            const date = new Date(year, month, day);
+            date.setHours(0, 0, 0, 0);
+            const phase = getPhaseForDate(date);
+            const isFertile = isDateInFertileWindow(date);
+            const isToday = date.getTime() === today.getTime();
+            
+            const classes = ['calendar-day'];
+            if (isToday) classes.push('today');
+            if (phase) classes.push(phase);
+            if (isFertile && phase !== 'ovulation') classes.push('fertile');
+            
+            html += `<div class="${classes.join(' ')}">${day}</div>`;
+        }
+        
+        // Next month days
+        const remainingDays = 42 - (startingDay + totalDays);
+        for (let day = 1; day <= remainingDays; day++) {
+            const date = new Date(year, month + 1, day);
+            const phase = getPhaseForDate(date);
+            const classes = ['calendar-day', 'other-month'];
+            if (phase) classes.push(phase);
+            html += `<div class="${classes.join(' ')}">${day}</div>`;
+        }
+        
+        elements.calendarGrid.innerHTML = html;
+    }
+
+    function getPhaseForDate(date) {
+        if (!state.lastPeriodDate) return null;
+        
+        const diffTime = date - state.lastPeriodDate;
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        
+        if (diffDays < 1) return null;
+        
+        const cycleDay = ((diffDays - 1) % state.cycleLength) + 1;
+        return getPhaseForDay(cycleDay);
+    }
+
+    function isDateInFertileWindow(date) {
+        if (!state.lastPeriodDate) return false;
+        
+        const diffTime = date - state.lastPeriodDate;
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        
+        if (diffDays < 1) return false;
+        
+        const cycleDay = ((diffDays - 1) % state.cycleLength) + 1;
+        const fertile = getFertileWindow();
+        
+        return fertile && cycleDay >= fertile.start && cycleDay <= fertile.end;
+    }
+
+    function updatePeriodLog() {
+        if (state.periodLogs.length === 0) {
+            elements.periodLogList.innerHTML = '<div class="empty-log">No hay períodos registrados</div>';
+            return;
+        }
+        
+        const sortedLogs = [...state.periodLogs].sort((a, b) => b.date - a.date);
+        
+        let html = '';
+        for (let i = 0; i < sortedLogs.length; i++) {
+            const log = sortedLogs[i];
+            const nextLog = sortedLogs[i + 1];
+            const cycleDays = nextLog ? Math.round((log.date - nextLog.date) / (1000 * 60 * 60 * 24)) : null;
+            
+            html += `
+                <div class="period-log-item" data-date="${log.date.toISOString()}">
+                    <div>
+                        <span class="period-log-date">${formatDate(log.date)}</span>
+                        ${cycleDays ? `<span class="period-log-days">Ciclo de ${cycleDays} días</span>` : ''}
+                    </div>
+                    <button class="period-log-delete" onclick="app.deletePeriodLog('${log.date.toISOString()}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+        }
+        
+        elements.periodLogList.innerHTML = html;
+    }
+
+    function updateSettings() {
+        if (state.lastPeriodDate) {
+            elements.lastPeriodDate.value = formatDateInput(state.lastPeriodDate);
+        }
+        elements.cycleLength.value = state.cycleLength;
+        elements.cycleLengthValue.textContent = state.cycleLength;
+        elements.periodLength.value = state.periodLength;
+        elements.periodLengthValue.textContent = state.periodLength;
+    }
+
+    // ===== Event Handlers =====
+    function toggleTheme() {
+        state.theme = state.theme === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', state.theme);
+        saveData();
+    }
+
+    function togglePanel(show) {
+        if (show) {
+            elements.settingsPanel.classList.add('active');
+        } else {
+            elements.settingsPanel.classList.remove('active');
+        }
+    }
+
+    function toggleModal(show) {
+        if (show) {
+            elements.newPeriodDate.value = formatDateInput(new Date());
+            elements.addPeriodModal.classList.add('active');
+        } else {
+            elements.addPeriodModal.classList.remove('active');
+        }
+    }
+
+    function handleLastPeriodChange(e) {
+        const date = new Date(e.target.value + 'T00:00:00');
+        if (!isNaN(date.getTime())) {
+            state.lastPeriodDate = date;
+            
+            // Also add to period logs if not exists
+            const exists = state.periodLogs.some(log => 
+                formatDateInput(log.date) === formatDateInput(date)
+            );
+            if (!exists) {
+                state.periodLogs.push({ date: date });
+            }
+            
+            saveData();
+            updateUI();
+            showToast('Fecha actualizada');
+        }
+    }
+
+    function handleCycleLengthChange(e) {
+        state.cycleLength = parseInt(e.target.value);
+        elements.cycleLengthValue.textContent = state.cycleLength;
+        saveData();
+        updateUI();
+    }
+
+    function handlePeriodLengthChange(e) {
+        state.periodLength = parseInt(e.target.value);
+        elements.periodLengthValue.textContent = state.periodLength;
+        saveData();
+        updateUI();
+    }
+
+    function navigateMonth(direction) {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
+        updateCalendar();
+    }
+
+    function savePeriod() {
+        const dateValue = elements.newPeriodDate.value;
+        if (!dateValue) {
+            showToast('Selecciona una fecha');
+            return;
+        }
+        
+        const date = new Date(dateValue + 'T00:00:00');
+        
+        // Check if already exists
+        const exists = state.periodLogs.some(log => 
+            formatDateInput(log.date) === formatDateInput(date)
+        );
+        
+        if (exists) {
+            showToast('Esta fecha ya está registrada');
+            return;
+        }
+        
+        state.periodLogs.push({ date: date });
+        
+        // Update last period date if this is the most recent
+        if (!state.lastPeriodDate || date > state.lastPeriodDate) {
+            state.lastPeriodDate = date;
+        }
+        
+        saveData();
+        updateUI();
+        toggleModal(false);
+        showToast('Período registrado');
+    }
+
+    function deletePeriodLog(dateString) {
+        const date = new Date(dateString);
+        state.periodLogs = state.periodLogs.filter(log => 
+            log.date.getTime() !== date.getTime()
+        );
+        
+        // Update last period date if needed
+        if (state.periodLogs.length > 0) {
+            const sortedLogs = [...state.periodLogs].sort((a, b) => b.date - a.date);
+            state.lastPeriodDate = sortedLogs[0].date;
+        } else {
+            state.lastPeriodDate = null;
+        }
+        
+        saveData();
+        updateUI();
+        showToast('Registro eliminado');
+    }
+
+    function exportData() {
+        const dataToExport = {
+            version: 1,
+            exportDate: new Date().toISOString(),
+            data: {
+                lastPeriodDate: state.lastPeriodDate ? state.lastPeriodDate.toISOString() : null,
+                cycleLength: state.cycleLength,
+                periodLength: state.periodLength,
+                periodLogs: state.periodLogs.map(log => ({
+                    date: log.date.toISOString()
+                }))
+            }
+        };
+        
+        const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ciclo-backup-${formatDateInput(new Date())}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast('Datos exportados');
+    }
+
+    function importData(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const imported = JSON.parse(event.target.result);
+                
+                if (imported.data) {
+                    state.lastPeriodDate = imported.data.lastPeriodDate ? new Date(imported.data.lastPeriodDate) : null;
+                    state.cycleLength = imported.data.cycleLength || 28;
+                    state.periodLength = imported.data.periodLength || 5;
+                    state.periodLogs = (imported.data.periodLogs || []).map(log => ({
+                        date: new Date(log.date)
+                    }));
+                    
+                    saveData();
+                    updateUI();
+                    showToast('Datos importados correctamente');
+                } else {
+                    showToast('Archivo no válido');
+                }
+            } catch (error) {
+                console.error('Import error:', error);
+                showToast('Error al importar');
+            }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+    }
+
+    function clearData() {
+        if (confirm('¿Estás segura de que quieres borrar todos los datos? Esta acción no se puede deshacer.')) {
+            localStorage.removeItem(STORAGE_KEY);
+            state = {
+                lastPeriodDate: null,
+                cycleLength: 28,
+                periodLength: 5,
+                periodLogs: [],
+                theme: state.theme
+            };
+            saveData();
+            updateUI();
+            showToast('Datos eliminados');
+        }
+    }
+
+    function installApp() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choice) => {
+                if (choice.outcome === 'accepted') {
+                    showToast('¡Gracias por instalar Ciclo!');
+                }
+                deferredPrompt = null;
+                elements.installPrompt.classList.remove('active');
+            });
+        }
+    }
+
+    function dismissInstall() {
+        elements.installPrompt.classList.remove('active');
+    }
+
+    // ===== Utilities =====
+    function formatDate(date) {
+        const options = { day: 'numeric', month: 'short', year: 'numeric' };
+        return date.toLocaleDateString('es-ES', options);
+    }
+
+    function formatDateInput(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    function showToast(message) {
+        elements.toastMessage.textContent = message;
+        elements.toast.classList.add('active');
+        setTimeout(() => {
+            elements.toast.classList.remove('active');
+        }, 3000);
+    }
+
+    function registerServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('Service Worker registrado'))
+                .catch(err => console.log('Error SW:', err));
+        }
+    }
+
+    // ===== Public API =====
+    window.app = {
+        deletePeriodLog: deletePeriodLog
+    };
+
+    // ===== Start =====
+    document.addEventListener('DOMContentLoaded', init);
+})();
